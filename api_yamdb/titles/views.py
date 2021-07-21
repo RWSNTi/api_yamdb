@@ -4,7 +4,10 @@ from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      DestroyAPIView)
 
-from apps.account.permissions import IsAdminPermission, ReadOnlyPermission
+from rest_framework.permissions import IsAdminUser
+from .permissions import ReadOnly
+# from apps.account.permissions import IsAdminPermission, ReadOnlyPermission из Эталонного кода
+
 from .filters import TitleFilterBackend
 from .models import Category, Genre, Title
 from .serializers import (CategorySerializer, TitleSerializer,
@@ -12,7 +15,7 @@ from .serializers import (CategorySerializer, TitleSerializer,
 
 
 class CommonListAPIView(ListCreateAPIView):
-    permission_classes = [IsAdminPermission | ReadOnlyPermission]
+    permission_classes = [IsAdminUser | ReadOnly]  # [IsAdminPermission | ReadOnlyPermission]
     filter_backends = [SearchFilter]
     search_fields = ('name',)
 
@@ -23,7 +26,7 @@ class CategoriesListAPIView(CommonListAPIView):
 
 
 class CategoriesDetailAPIView(DestroyAPIView):
-    permission_classes = [IsAdminPermission]
+    permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(Category, slug=self.kwargs['slug'])
@@ -35,14 +38,14 @@ class GenreListAPIView(CommonListAPIView):
 
 
 class GenreDetailAPIView(DestroyAPIView):
-    permission_classes = [IsAdminPermission]
+    permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(Genre, slug=self.kwargs['slug'])
 
 
 class TitleListAPIView(ListCreateAPIView):
-    permission_classes = [IsAdminPermission | ReadOnlyPermission]
+    permission_classes = [IsAdminUser | ReadOnly]
     queryset = Title.objects.all()
     filter_backends = [TitleFilterBackend]
 
@@ -51,7 +54,7 @@ class TitleListAPIView(ListCreateAPIView):
 
 
 class TitleDetailAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminPermission | ReadOnlyPermission]
+    permission_classes = [IsAdminUser | ReadOnly]
     queryset = Title.objects.all()
 
     def get_serializer_class(self):
