@@ -42,9 +42,20 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
     score = serializers.IntegerField(min_value=1, max_value=10)
 
+    def validate(self, data):
+        user = self.context['request'].user
+        title_id = self.context['view'].kwargs.get('title_id')
+        if self.context['request'].method != 'POST':
+            return data
+        if Review.objects.filter(title=title_id, author=user).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение'
+            )
+        return data
+
     class Meta:
         model = Review
-        fields = ('text', 'author', 'title', 'pub_date', 'score')
+        fields = ('id', 'text', 'author', 'title', 'score', 'pub_date',)
         read_only_fields = ('title',)
 
 
