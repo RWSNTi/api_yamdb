@@ -1,5 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.text import slugify
+
+User = get_user_model()
 
 
 class CategoryAbstract(models.Model):
@@ -50,3 +53,41 @@ class Title(models.Model):
     def rating(self):
         rating = self.reviews.aggregate(models.Avg('score')).get('score__avg')
         return rating
+
+
+class Review(models.Model):
+    text = models.TextField('Отзыв')
+    title = models.ForeignKey(Title, related_name='reviews',
+                              verbose_name='Произведение',
+                              on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name='reviews', verbose_name='Автор')
+    pub_date = models.DateTimeField(auto_now_add=True,
+                                    verbose_name='Дата отзыва')
+    score = models.PositiveIntegerField('Оценка', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ('-pub_date',)
+
+    def __str__(self):
+        return self.text[:20]
+
+
+class Comment(models.Model):
+    text = models.TextField(max_length=500, verbose_name='Текст комментария')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name='comments', verbose_name='Автор')
+    created = models.DateTimeField(auto_now_add=True,
+                                   verbose_name='Дата комментария')
+    review = models.ForeignKey(Review, on_delete=models.CASCADE,
+                               related_name='comments')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ('-created',)
+
+    def __str__(self):
+        return self.text[:15]
