@@ -32,4 +32,5 @@ urlpatterns = [
     path('api/v1/categories/', include('titles.urls.category')),
     path('api/v1/genres/', include('titles.urls.genre')),
     path('api/v1/titles/', include('titles.urls.titles')),
+    path('api/', include('titles.urls.urls')),
 ]
