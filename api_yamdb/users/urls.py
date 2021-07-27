@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import APIRegEmail, APIRegUser
+from .views import APIRegEmail, APIRegUser, APIGetUser
 
 
 urlpatterns = [
