@@ -39,3 +39,7 @@ class APIRegUser(APIView):
             serializer.save(email=email_adr, username=email_adr)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class APIGetUser(APIView):
+    pass
