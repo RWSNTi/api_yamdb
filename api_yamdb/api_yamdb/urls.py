@@ -28,7 +28,7 @@ urlpatterns = [
     # базовые, для управления пользователями в Django:
     path('api/v1/users/', include('djoser.urls')),
     # JWT-эндпоинты, для управления JWT-токенами:
-    path('auth/', include('djoser.urls.jwt')),
+    path('api/v1/auth/', include('users.urls')),
     path('api/v1/categories/', include('titles.urls.category')),
     path('api/v1/genres/', include('titles.urls.genre')),
     path('api/v1/titles/', include('titles.urls.titles')),
