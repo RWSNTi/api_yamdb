@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from .models import RegistrationEmail, User
+from .models import RegistrationEmail, User, CHOICES
 
 
 class RegEmailSerializer(serializers.ModelSerializer):
@@ -31,3 +31,17 @@ class RegUserSerializer(serializers.ModelSerializer):
         fields = ('email', 'username')
         model = User
         validators = []
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    first_name = serializers.CharField(max_length=30, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    bio = serializers.CharField(max_length=300, required=False)
+    role = serializers.ChoiceField(choices=CHOICES, required=False)
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ('first_name', 'last_name',
+                  'username', 'bio', 'email', 'role')
+        model = User

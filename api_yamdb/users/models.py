@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 CHOICES = (
-    ('u', 'user'),
-    ('m', 'moderator'),
-    ('a', 'admin')
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin')
 )
 
 
@@ -30,8 +30,8 @@ class User(AbstractUser):
     role = models.CharField(max_length=16, choices=CHOICES, default=CHOICES[0])
     password = models.CharField('password', max_length=25)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', ]
 
 
 class RegistrationEmail(models.Model):

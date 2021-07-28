@@ -1,10 +1,10 @@
 from django.urls import path
 
-from .views import APIRegEmail, APIRegUser, APIGetUser
+from .views import APIRegEmail, APIRegUser, APIGetUsers
 
 
 urlpatterns = [
-    path('mail', APIRegEmail.as_view(), name='reg_email'),
-    path('token', APIRegUser.as_view(), name='reg_user'),
-    path('users', APIGetUser.as_view(), name='get_user'),
+    path('v1/auth/mail', APIRegEmail.as_view(), name='reg_email'),
+    path('v1/auth/token', APIRegUser.as_view(), name='reg_user'),
+    path('v1/users/', APIGetUsers.as_view(), name='get_users'),
 ]
