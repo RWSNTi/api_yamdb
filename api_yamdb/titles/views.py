@@ -13,7 +13,7 @@ from .permissions import ReadOnly
 
 from .filters import TitleFilterBackend
 from .models import Category, Genre, Review, Title
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrStaffOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, 
                           TitleCreateSerializer, TitleSerializer)
@@ -68,7 +68,7 @@ class TitleDetailAPIView(RetrieveUpdateDestroyAPIView):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrStaffOrReadOnly]
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -82,7 +82,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrStaffOrReadOnly]
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
