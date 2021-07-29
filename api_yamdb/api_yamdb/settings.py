@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'titles',
     'users',
+    'django_filters',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -147,6 +148,6 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
