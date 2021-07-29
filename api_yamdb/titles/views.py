@@ -5,19 +5,18 @@ from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      DestroyAPIView)
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
-# from apps.account.permissions import IsAdminPermission, ReadOnlyPermission из Эталонного кода
+from rest_framework.permissions import IsAdminUser
 
 from .filters import TitleFilterBackend
 from .models import Category, Genre, Review, Title
 from .permissions import IsOwnerOrStaffOrReadOnly, ReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, 
+                          GenreSerializer, ReviewSerializer,
                           TitleCreateSerializer, TitleSerializer)
 
 
 class CommonListAPIView(ListCreateAPIView):
-    permission_classes = [IsAdminUser | ReadOnly]  # [IsAdminPermission | ReadOnlyPermission]
+    permission_classes = [IsAdminUser | ReadOnly]
     filter_backends = [SearchFilter]
     search_fields = ('name',)
 
@@ -52,7 +51,9 @@ class TitleListAPIView(ListCreateAPIView):
     filter_backends = [TitleFilterBackend]
 
     def get_serializer_class(self):
-        return TitleCreateSerializer if self.request.method == 'POST' else TitleSerializer
+        return(
+            TitleCreateSerializer if
+            self.request.method == 'POST' else TitleSerializer)
 
 
 class TitleDetailAPIView(RetrieveUpdateDestroyAPIView):
@@ -60,7 +61,9 @@ class TitleDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Title.objects.all()
 
     def get_serializer_class(self):
-        return TitleCreateSerializer if self.request.method in ['PATCH', 'PUT'] else TitleSerializer
+        return(
+            TitleCreateSerializer if
+            self.request.method in ['PATCH', 'PUT'] else TitleSerializer)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

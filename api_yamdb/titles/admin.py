@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
 from .models import User, Category, Comment, Genre, Review, Title
+from users.models import RegistrationEmail
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -33,9 +33,24 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('pub_date', 'author')
 
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'username', 'first_name', 'last_name',
+                    'bio', 'role')
+    search_fields = ('username',)
+    list_filter = ('username', )
+    empty_value_display = '-пусто-'
+
+
+class RegistrationEmailAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'email', 'confirmation_code')
+    search_fields = ('email',)
+    empty_value_display = '-пусто-'
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Title, TitleAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(RegistrationEmail, RegistrationEmailAdmin)

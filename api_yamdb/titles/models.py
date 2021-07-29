@@ -80,7 +80,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='comments', verbose_name='Автор')
     pub_date = models.DateTimeField(auto_now_add=True,
-                                   verbose_name='Дата комментария')
+                                    verbose_name='Дата комментария')
     review = models.ForeignKey(Review, on_delete=models.CASCADE,
                                related_name='comments')
 

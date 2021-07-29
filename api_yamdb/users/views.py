@@ -1,15 +1,14 @@
-from django.shortcuts import render
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
-from rest_framework import status, permissions, generics, mixins, viewsets
+from rest_framework import status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import User, RegistrationEmail
+from titles.permissions import IsAdminAdmin
+from .models import User, CHOICES
 from .serializers import (RegEmailSerializer,
                           RegUserSerializer,
                           UserSerializer
@@ -48,10 +47,13 @@ class APIRegUser(APIView):
                 token = AccessToken().for_user(user)
                 response = {'access': str(token)}
             except Exception:
-                serializer.save(email=email_adr, username=email_adr)
+                serializer.save(email=email_adr, username=email_adr,
+                                role=CHOICES[0])
+                print(serializer.data)
                 user = get_object_or_404(User, email=email_adr)
+                print(user.role)
                 token = AccessToken().for_user(user)
-                response = {'access': str(token)}
+                response = {'token': str(token)}
             return Response(response, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,36 +63,34 @@ class APIGetUsers(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        try:
-            serializer.is_valid()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as error:
-            return Response((serializer.errors, error),
-                            status=status.HTTP_400_BAD_REQUEST)
 
-
-class RetrieveUpdateViewSet(mixins.UpdateModelMixin, mixins.RetrieveModelMixin,
-                            viewsets.GenericViewSet):
-    pass
-
-"""
-class GetUserViewSet(RetrieveUpdateViewSet):
-
-    def get(self, request):
-        user = User.objects.get(username=request['username'])
-        serializer = UserSerializer(user)
-        print(user)
-#        user = get_object_or_404(User, username=self.kwargs['username'])
-        return Response(serializer.data, status=status.HTTP_200_OK)
-"""
-
-
-class APIGetUser(generics.RetrieveUpdateAPIView):
+class APIGetUser(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminAdmin, ]
     serializer_class = UserSerializer
     queryset = User.objects.all()
     filter_backends = [DjangoFilterBackend, ]
     lookup_field = 'username'
     filterset_fields = ['username', ]
+
+
+class APIGetUpdateMeUser(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def get(self, request):
+        user = self.request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        user = self.request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid() and (
+                'user' in user.role and user.is_staff is False):
+            serializer.save(role=CHOICES[0])
+            response = 'Вы можете изменить любые данные, кроме роли'
+            return Response((response, serializer.data),
+                            status=status.HTTP_200_OK)
+        elif serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

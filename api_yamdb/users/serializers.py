@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .models import RegistrationEmail, User, CHOICES
 
@@ -16,6 +17,8 @@ class RegEmailSerializer(serializers.ModelSerializer):
 class RegUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     email = serializers.EmailField()
+    role = serializers.ChoiceField(required=False,
+                                   choices=CHOICES)
 
     def validate_email(self, value):
         code = self.initial_data['confirmation_code']
@@ -28,18 +31,20 @@ class RegUserSerializer(serializers.ModelSerializer):
         return super().validate(value)
 
     class Meta:
-        fields = ('email', 'username')
+        fields = ('email', 'username', 'role')
         model = User
         validators = []
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())])
     first_name = serializers.CharField(max_length=30, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     bio = serializers.CharField(max_length=300, required=False)
     role = serializers.ChoiceField(choices=CHOICES, required=False)
-    email = serializers.EmailField()
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())])
 
     class Meta:
         fields = ('first_name', 'last_name',
