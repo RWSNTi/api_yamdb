@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import Category, Comment, Genre, Review, Title
+from .models import User, Category, Comment, Genre, Review, Title
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -27,11 +28,12 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'author', 'created', 'review')
+    list_display = ('id', 'text', 'author', 'pub_date', 'review')
     search_fields = ('text',)
-    list_filter = ('created', 'author')
+    list_filter = ('pub_date', 'author')
 
 
+admin.site.register(User, UserAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Title, TitleAdmin)
