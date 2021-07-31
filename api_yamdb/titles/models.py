@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
 from django.utils.text import slugify
+
+from .validators import year_validator
 
 User = get_user_model()
 
 
 class CategoryAbstract(models.Model):
-    name = models.CharField('Название', max_length=100)
+    name = models.CharField(verbose_name='Название', max_length=100)
     slug = models.SlugField(unique=True, db_index=True)
 
     class Meta:
@@ -23,7 +26,7 @@ class CategoryAbstract(models.Model):
 
 class Category(CategoryAbstract):
     class Meta:
-        verbose_name = 'Категорию'
+        verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
 
@@ -36,10 +39,13 @@ class Genre(CategoryAbstract):
 class Title(models.Model):
     category = models.ForeignKey(
         Category, verbose_name='Категория',
-        on_delete=models.PROTECT, related_name='titles')
-    name = models.CharField('Название', max_length=150)
-    description = models.TextField('Описание', blank=True, null=True)
-    year = models.PositiveSmallIntegerField('Год')
+        on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='titles')
+    name = models.CharField(verbose_name='Название', max_length=150)
+    description = models.TextField(verbose_name='Описание',
+                                   blank=True, null=True)
+    year = models.PositiveSmallIntegerField(verbose_name='Год',
+                                            validators=(year_validator,))
     genre = models.ManyToManyField(Genre, verbose_name='Жанры')
 
     class Meta:
@@ -56,7 +62,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField('Отзыв')
+    text = models.TextField(verbose_name='Отзыв')
     title = models.ForeignKey(Title, related_name='reviews',
                               verbose_name='Произведение',
                               on_delete=models.CASCADE)
@@ -64,7 +70,12 @@ class Review(models.Model):
                                related_name='reviews', verbose_name='Автор')
     pub_date = models.DateTimeField(auto_now_add=True,
                                     verbose_name='Дата отзыва')
-    score = models.PositiveIntegerField('Оценка', blank=True, null=True)
+    score = models.PositiveIntegerField(
+        verbose_name='Оценка отзыва', blank=True, null=True,
+        validators=(
+            validators.MinValueValidator(1), validators.MaxValueValidator(10)
+        )
+    )
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -82,7 +93,8 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True,
                                     verbose_name='Дата комментария')
     review = models.ForeignKey(Review, on_delete=models.CASCADE,
-                               related_name='comments')
+                               related_name='comments',
+                               verbose_name='Отзыв')
 
     class Meta:
         verbose_name = 'Комментарий'

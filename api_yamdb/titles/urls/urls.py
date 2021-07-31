@@ -4,6 +4,7 @@ from rest_framework import routers
 
 from ..views import CommentViewSet, ReviewViewSet
 
+
 router = routers.DefaultRouter()
 router.register(
     r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, basename='reviews'
@@ -14,5 +15,8 @@ router.register(
 )
 
 urlpatterns = [
+    path('v1/categories/', include('titles.urls.category')),
+    path('v1/genres/', include('titles.urls.genre')),
+    path('v1/titles/', include('titles.urls.titles')),
     path('v1/', include(router.urls))
 ]
