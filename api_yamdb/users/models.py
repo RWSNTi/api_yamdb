@@ -2,16 +2,17 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
-CHOICES = (
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin')
-)
-
 
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    CHOICES = (
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin')
+    )
     username_validator = UnicodeUsernameValidator()
-
     email = models.EmailField('email адрес', unique=True)
     username = models.CharField(
         'Псевдоним',
