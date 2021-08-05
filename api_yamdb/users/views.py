@@ -67,25 +67,24 @@ class UserMeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminAdmin, ]
     lookup_field = 'username'
 
-    @action(detail=False, methods=['get'], url_path='me',
-            permission_classes=[permissions.IsAuthenticated])
-    def get(self, request):
-        user = User.objects.get(username=request.user)
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['patch'], url_path='me',
-            permission_classes=[permissions.IsAuthenticated])
-    def patch(self, request):
-        user = self.request.user
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid() and (
-                'user' in user.role and user.is_staff is False):
-            serializer.save(role=User.USER)
-            response = 'Вы можете изменить любые данные, кроме роли'
-            return Response((response, serializer.data),
-                            status=status.HTTP_200_OK)
-        elif serializer.is_valid():
-            serializer.save()
+    @action(detail=False, methods=['get', 'patch'], url_path='me',
+            permission_classes=(permissions.IsAuthenticated,))
+    def get_patch(self, request):
+        if request.method == 'GET':
+            user = User.objects.get(username=request.user)
+            serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user = self.request.user
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid() and (
+                    'user' in user.role and user.is_staff is False):
+                serializer.save(role=User.USER)
+                response = 'Вы можете изменить любые данные, кроме роли'
+                return Response((response, serializer.data),
+                                status=status.HTTP_200_OK)
+            elif serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)

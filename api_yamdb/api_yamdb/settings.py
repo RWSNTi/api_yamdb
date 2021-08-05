@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'titles',
     'users',
-    'django_filters',
 ]
 
 AUTH_USER_MODEL = 'users.User'
